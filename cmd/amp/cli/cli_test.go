@@ -117,7 +117,7 @@ func runTestSpec(t *testing.T, test *TestSpec) error {
 		if err == nil && cmdSpec.ExpectErrorStatus {
 			return fmt.Errorf("Command was expected to exit with error status but exited with zero")
 		}
-		if apiString != nil {
+		if  != nil {
 			apiString := strings.Fields(cmdSpec.APICall)
 			apiOutput, err := exec.Command(apiString[0], apiString[1:]...).CombinedOutput()
 			apiExpectedOutput := regexp.MustCompile(cmdSpec.APICallExpectation)
