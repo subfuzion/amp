@@ -6,6 +6,8 @@
     - --name pinger
     - -p www:90:3000
   expectation: ([a-z0-9]{25})
+  apiCall: amp logs pinger
+  apiCallExpectation: "listening on port: 3000"
 
 - service-list:
   cmd: docker service ls
@@ -20,13 +22,14 @@
 #     - localhost:90/ping
 #   options:
 #   expectation: ((.)|(\s))*(pong)((.)|(\s))*
+#   delay: 1000
 
 - service-remove:
   cmd: amp service rm
   args:
     - pinger
   options:
-  expectation: (pinger)
+  expectation: "pinger"
 
 - service-list:
   cmd: docker service ls

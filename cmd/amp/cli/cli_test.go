@@ -12,6 +12,7 @@ import (
 	"regexp"
 	"strings"
 	"testing"
+	"time"
 )
 
 type TestSpec struct {
@@ -25,6 +26,9 @@ type CommandSpec struct {
 	Options            []string `yaml:"options"`
 	Expectation        string   `yaml:"expectation"`
 	ExpectErrorStatus  bool     `yaml:"expectErrorStatus"`
+	Delay              int64    `yaml:"delay"`
+	APICall            string   `yaml:"apiCall"`
+	APICallExpectation string   `yaml:"apiCallExpectation"`
 }
 
 var (
@@ -99,18 +103,27 @@ func loadTestSpec(fileName string) (*TestSpec, error) {
 
 func runTestSpec(t *testing.T, test *TestSpec) error {
 	for _, cmdSpec := range test.Commands {
+		time.Sleep(time.Duration(cmdSpec.Delay) * time.Millisecond)
 		cmdString := generateCmdString(&cmdSpec)
 		t.Logf("Running: %s", strings.Join(cmdString, " "))
-		actualOutput, err := exec.Command(cmdString[0], cmdString[1:]...).CombinedOutput()
-		expectedOutput := regexp.MustCompile(cmdSpec.Expectation)
-		if !expectedOutput.MatchString(string(actualOutput)) {
-			return fmt.Errorf("miss matched expected output: %s", actualOutput)
+		cmdActualOutput, err := exec.Command(cmdString[0], cmdString[1:]...).CombinedOutput()
+		cmdExpectedOutput := regexp.MustCompile(cmdSpec.Expectation)
+		if !cmdExpectedOutput.MatchString(string(cmdActualOutput)) {
+			return fmt.Errorf("miss matched expected output: %s", cmdActualOutput)
 		}
 		if err != nil && !cmdSpec.ExpectErrorStatus {
 			return fmt.Errorf("Command was expected to exit with zero status but got: %v", err)
 		}
 		if err == nil && cmdSpec.ExpectErrorStatus {
 			return fmt.Errorf("Command was expected to exit with error status but exited with zero")
+		}
+		if apiString != nil {
+			apiString := strings.Fields(cmdSpec.APICall)
+			apiOutput, err := exec.Command(apiString[0], apiString[1:]...).CombinedOutput()
+			apiExpectedOutput := regexp.MustCompile(cmdSpec.APICallExpectation)
+			if !apiExpectedOutput.MatchString(string(apiOutput)) {
+				return fmt.Errorf("API check not passed: %s", apiOutput)
+			}
 		}
 	}
 	return nil
