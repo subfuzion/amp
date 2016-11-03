@@ -3,11 +3,11 @@
   args:
     - appcelerator/pinger
   options:
-    - --name pinger
+    - --name {{pinger}}
     - -p www:90:3000
   expectation: ([a-z0-9]{25})
-  apiCall: amp logs pinger
-  apiCallExpectation: "listening on port: 3000"
+  apiCall: amp logs {{pinger}}
+  apiCallExpectation: "((?ms)(listening on :3000)+)"
 
 - service-list:
   cmd: docker service ls

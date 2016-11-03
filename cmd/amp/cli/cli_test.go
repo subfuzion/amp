@@ -13,6 +13,10 @@ import (
 	"strings"
 	"testing"
 	"time"
+	"text/template"
+	"math/rand"
+	"strconv"
+	"bytes"
 )
 
 type TestSpec struct {
@@ -33,6 +37,10 @@ type CommandSpec struct {
 
 var (
 	testDir = "./test_samples"
+	nameMap = map[string]string{}
+	fmap = template.FuncMap {
+		"mapName" : mapName,
+	}
 )
 
 func TestMain(m *testing.M) {
@@ -117,16 +125,28 @@ func runTestSpec(t *testing.T, test *TestSpec) error {
 		if err == nil && cmdSpec.ExpectErrorStatus {
 			return fmt.Errorf("Command was expected to exit with error status but exited with zero")
 		}
-		if  != nil {
+		if len(cmdSpec.APICall) != 0 {
 			apiString := strings.Fields(cmdSpec.APICall)
 			apiOutput, err := exec.Command(apiString[0], apiString[1:]...).CombinedOutput()
 			apiExpectedOutput := regexp.MustCompile(cmdSpec.APICallExpectation)
 			if !apiExpectedOutput.MatchString(string(apiOutput)) {
-				return fmt.Errorf("API check not passed: %s", apiOutput)
+				return fmt.Errorf("API check not passed: %s", err)
 			}
 		}
 	}
 	return nil
+}
+
+func mapName(name string) string {
+	if _, ok := nameMap[name]; !ok {
+		fmt.Println(name)
+		i := rand.Int()
+		newName := name + strconv.Itoa(i)
+		nameMap[name] = newName
+		fmt.Println(newName)
+		return newName
+	}
+	return nameMap[name]
 }
 
 func generateCmdString(cmdSpec *CommandSpec) (cmdString []string) {
@@ -137,5 +157,21 @@ func generateCmdString(cmdSpec *CommandSpec) (cmdString []string) {
 	}
 	cmdString = append(cmdSplit, cmdSpec.Args...)
 	cmdString = append(cmdString, optionsSplit...)
+	str := mapName("Hi")
+	fmt.Println(str)
+	for i, cmd := range cmdString {
+		if strings.ContainsAny(cmd, "{{}}") {
+			fmt.Println(cmd)
+			tmpl := template.Must(template.New("Template: %s", cmd).Funcs(fmap).Parse("{{.mapName}}"))
+			var doc bytes.Buffer
+			error := tmpl.Execute(&doc, )
+			if error != nil {
+				fmt.Errorf("Name change: %s", error)
+			}
+			s := doc.String()
+			fmt.Println(s)
+			cmdString[i] = s
+		}
+	}
 	return
 }
