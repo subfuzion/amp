@@ -30,7 +30,6 @@ type CommandSpec struct {
 	Options            []string `yaml:"options"`
 	Expectation        string   `yaml:"expectation"`
 	ExpectErrorStatus  bool     `yaml:"expectErrorStatus"`
-	Delay              int64    `yaml:"delay"`
 	APICall            string   `yaml:"apiCall"`
 	APICallExpectation string   `yaml:"apiCallExpectation"`
 }
@@ -111,7 +110,6 @@ func loadTestSpec(fileName string) (*TestSpec, error) {
 
 func runTestSpec(t *testing.T, test *TestSpec) error {
 	for _, cmdSpec := range test.Commands {
-		time.Sleep(time.Duration(cmdSpec.Delay) * time.Millisecond)
 		cmdString := generateCmdString(&cmdSpec)
 		t.Logf("Running: %s", strings.Join(cmdString, " "))
 		cmdActualOutput, err := exec.Command(cmdString[0], cmdString[1:]...).CombinedOutput()
@@ -157,21 +155,5 @@ func generateCmdString(cmdSpec *CommandSpec) (cmdString []string) {
 	}
 	cmdString = append(cmdSplit, cmdSpec.Args...)
 	cmdString = append(cmdString, optionsSplit...)
-	str := mapName("Hi")
-	fmt.Println(str)
-	for i, cmd := range cmdString {
-		if strings.ContainsAny(cmd, "{{}}") {
-			fmt.Println(cmd)
-			tmpl := template.Must(template.New("Template: %s", cmd).Funcs(fmap).Parse("{{.mapName}}"))
-			var doc bytes.Buffer
-			error := tmpl.Execute(&doc, )
-			if error != nil {
-				fmt.Errorf("Name change: %s", error)
-			}
-			s := doc.String()
-			fmt.Println(s)
-			cmdString[i] = s
-		}
-	}
 	return
 }

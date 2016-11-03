@@ -22,7 +22,6 @@
 #     - localhost:90/ping
 #   options:
 #   expectation: ((.)|(\s))*(pong)((.)|(\s))*
-#   delay: 1000
 
 - service-remove:
   cmd: amp service rm
