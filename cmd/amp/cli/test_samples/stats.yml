@@ -5,6 +5,7 @@
   options:
     -
   expectation: stats-container
+  retry: 5
 
 - stats-cpu:
   cmd: amp stats
@@ -13,6 +14,7 @@
   options:
     -
   expectation: stats-cpu
+  retry: 5
 
 - stats-io:
   cmd: amp stats
@@ -21,6 +23,7 @@
   options:
     -
   expectation: stats-io
+  retry: 5
 
 - stats-net:
   cmd: amp stats
@@ -29,6 +32,7 @@
   options:
     -
   expectation: stats-net
+  retry: 5
 
 - stats-node:
   cmd: amp stats
@@ -37,6 +41,7 @@
   options:
     -
   expectation: stats-node
+  retry: 5
 
 - stats-service:
   cmd: amp stats
@@ -45,6 +50,7 @@
   options:
     -
   expectation: stats-service
+  retry: 5
 
 - stats-task:
   cmd: amp stats
@@ -53,3 +59,4 @@
   options:
     -
   expectation: stats-task
+  retry: 5

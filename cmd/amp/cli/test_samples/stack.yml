@@ -5,6 +5,8 @@
   options:
      - -f ../../../api/rpc/stack/test_samples/sample-04.yml
   expectation: stack-id
+  retry: 5
+  #timeout: 10000
 
 - stack-list:
   cmd: amp stack ls
@@ -13,6 +15,8 @@
   options:
     -
   expectation: stack-list
+  retry: 5
+  timeout:
 
 - stack-stop:
   cmd: amp stack stop
@@ -21,6 +25,7 @@
   options:
     -
   expectation: stack-id
+  retry: 5
 
 - stack-list:
   cmd: amp stack ls
@@ -29,14 +34,16 @@
   options:
     -
   expectation: stack-unavailable
+  retry: 5
 
-- stack-restart:
+- stack-start:
   cmd: amp stack start
   args:
     - stack1
   options:
     -
   expectation: stack-id
+  retry: 5
 
 - stack-list:
   cmd: amp stack ls
@@ -45,6 +52,7 @@
   options:
     -
   expectation: stack-list
+  retry: 5
 
 - stack-stop:
   cmd: amp stack stop
@@ -53,6 +61,7 @@
   options:
     -
   expectation: stack-id
+  retry: 5
 
 - stack-remove:
   cmd: amp stack rm
@@ -61,6 +70,7 @@
   options:
     -
   expectation: stack-id
+  retry: 5
 
 - stack-list:
   cmd: amp stack ls
@@ -69,3 +79,4 @@
   options:
     -
   expectation: stack-unavailable
+  retry: 5

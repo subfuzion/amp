@@ -25,10 +25,7 @@ type CommandSpec struct {
 	Options            []string `yaml:"options"`
 	Expectation        string   `yaml:"expectation"`
 	ExpectErrorStatus  bool     `yaml:"expectErrorStatus"`
-}
-
-type LookupSpec struct {
-	Name string
+	Retry 						 int			`yaml:"retry"`
 }
 
 var (
@@ -110,22 +107,37 @@ func loadTestSpec(fileName string) (*TestSpec, error) {
 	return testSpec, nil
 }
 
-func runTestSpec(t *testing.T, test *TestSpec) error {
+func runTestSpec(t *testing.T, test *TestSpec) (err error) {
+	var i int
 	for _, cmdSpec := range test.Commands {
 		cmdString := generateCmdString(&cmdSpec)
 		t.Logf("Running: %s", strings.Join(cmdString, " "))
-		actualOutput, err := exec.Command(cmdString[0], cmdString[1:]...).CombinedOutput()
-		expectedOutput := regexp.MustCompile(cmdSpec.Expectation)
-		if !expectedOutput.MatchString(string(actualOutput)) {
-			return fmt.Errorf("miss matched expected output: %s", actualOutput)
+		for i = -1; i < cmdSpec.Retry; i++ {
+			err = runCmdSpec(cmdString, cmdSpec)
+			if err == nil {
+				break
+			}
 		}
-		if err != nil && !cmdSpec.ExpectErrorStatus {
-			return fmt.Errorf("Command was expected to exit with zero status but got: %v", err)
-		}
-		if err == nil && cmdSpec.ExpectErrorStatus {
-			return fmt.Errorf("Command was expected to exit with error status but exited with zero")
+		if i > 0 && i == cmdSpec.Retry {
+			  t.Log("This command :", cmdString, "has re-run", i, "times.")
 		}
 	}
+	return err
+}
+
+func runCmdSpec(cmdString []string, cmdSpec CommandSpec) (error) {
+	actualOutput, err := exec.Command(cmdString[0], cmdString[1:]...).CombinedOutput()
+	expectedOutput := regexp.MustCompile(cmdSpec.Expectation)
+	if !expectedOutput.MatchString(string(actualOutput)) {
+		return fmt.Errorf("miss matched expected output: %s", actualOutput)
+	}
+	if err != nil && !cmdSpec.ExpectErrorStatus {
+		return fmt.Errorf("Command was expected to exit with zero status but got: %v", err)
+	}
+	if err == nil && cmdSpec.ExpectErrorStatus {
+		return fmt.Errorf("Command was expected to exit with error status but exited with zero")
+	}
+
 	return nil
 }
 

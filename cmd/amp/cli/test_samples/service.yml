@@ -6,12 +6,14 @@
     - --name pinger
     - -p www:90:3000
   expectation: service-id
+  retry: 5
 
 - service-list:
   cmd: docker service ls
   args:
   options:
   expectation: docker-service-list
+  retry: 5
 
 # Commented out until Delay and APIcall (Blocking) implemented.
 # - service-curl:
@@ -28,9 +30,11 @@
   options:
     -
   expectation: service-id
+  retry: 5
 
 - service-list:
   cmd: docker service ls
   args:
   options:
   expectation: docker-service-list
+  retry: 5
