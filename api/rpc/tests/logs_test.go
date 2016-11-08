@@ -34,6 +34,54 @@ var (
 	sc              stan.Conn
 )
 
+func produceLogEntries(howMany int) error {
+	for i := 0; i < howMany; i++ {
+		message, err := proto.Marshal(&LogEntry{
+			Infrastructure: rand.Int() % 2 == 0,
+			ContainerId: testContainerID,
+			Message:     testMessage + strconv.Itoa(rand.Int()),
+			NodeId:      testNodeID,
+			ServiceId:   testServiceID,
+			ServiceName: testServiceName,
+			StackId:     testStackID,
+			StackName:   testStackName,
+			Timestamp:   time.Now().Format(time.RFC3339Nano),
+			TimeId:      time.Now().Format(time.RFC3339Nano),
+		})
+		err = sc.Publish(NatsLogTopic, message)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func listenToLogEntries(stream Logs_GetStreamClient, howMany int) (chan *LogEntry, error) {
+	entries := make(chan *LogEntry, howMany)
+	entryCount := 0
+	timeout := time.After(5 * time.Second)
+
+	defer func() {
+		close(entries)
+	}()
+
+	for {
+		entry, err := stream.Recv()
+		select {
+		case entries <- entry:
+			if err != nil {
+				return nil, err
+			}
+			entryCount++
+			if entryCount == howMany {
+				return entries, nil
+			}
+		case <-timeout:
+			return entries, nil
+		}
+	}
+}
+
 func TestLogsInit(t *testing.T) {
 	var err error
 	log.Printf("Connecting to nats: %s\n", config.NatsURL)
@@ -176,6 +224,17 @@ func TestLogsShouldFilterByStack(t *testing.T) {
 	}
 }
 
+func TestLogsShouldFilterByInfrastructureRole(t *testing.T) {
+	r, err := logsClient.Get(ctx, &GetRequest{Infrastructure: true})
+	if err != nil {
+		t.Error(err)
+	}
+	assert.NotEmpty(t, r.Entries, "We should have at least one entry")
+	for _, entry := range r.Entries {
+		assert.True(t, entry.Infrastructure)
+	}
+}
+
 func TestLogsShouldFetchGivenNumberOfEntries(t *testing.T) {
 	for i := int64(1); i < 100; i += 10 {
 		r, err := logsClient.Get(ctx, &GetRequest{Size: i})
@@ -183,53 +242,6 @@ func TestLogsShouldFetchGivenNumberOfEntries(t *testing.T) {
 			t.Error(err)
 		}
 		assert.Equal(t, i, int64(len(r.Entries)))
-	}
-}
-
-func produceLogEntries(howMany int) error {
-	for i := 0; i < howMany; i++ {
-		message, err := proto.Marshal(&LogEntry{
-			ContainerId: testContainerID,
-			Message:     testMessage + strconv.Itoa(rand.Int()),
-			NodeId:      testNodeID,
-			ServiceId:   testServiceID,
-			ServiceName: testServiceName,
-			StackId:     testStackID,
-			StackName:   testStackName,
-			Timestamp:   time.Now().Format(time.RFC3339Nano),
-			TimeId:      time.Now().Format(time.RFC3339Nano),
-		})
-		err = sc.Publish(NatsLogTopic, message)
-		if err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-func listenToLogEntries(stream Logs_GetStreamClient, howMany int) (chan *LogEntry, error) {
-	entries := make(chan *LogEntry, howMany)
-	entryCount := 0
-	timeout := time.After(5 * time.Second)
-
-	defer func() {
-		close(entries)
-	}()
-
-	for {
-		entry, err := stream.Recv()
-		select {
-		case entries <- entry:
-			if err != nil {
-				return nil, err
-			}
-			entryCount++
-			if entryCount == howMany {
-				return entries, nil
-			}
-		case <-timeout:
-			return entries, nil
-		}
 	}
 }
 

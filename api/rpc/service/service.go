@@ -13,10 +13,13 @@ import (
 
 var (
 	defaultNetwork = "amp-public"
-	err            error
+	err error
 )
 
-const serviceRoleLabelName = "io.amp.role"
+const (
+	serviceRoleLabelName = "io.amp.role"
+		serviceRoleUser = "user"
+)
 
 // Service is used to implement ServiceServer
 type Service struct {
@@ -109,7 +112,12 @@ func (s *Service) Create(ctx context.Context, req *ServiceCreateRequest) (*Servi
 	if service.Annotations.Labels == nil {
 		service.Annotations.Labels = make(map[string]string)
 	}
-	service.Annotations.Labels[serviceRoleLabelName] = "user"
+	service.Annotations.Labels[serviceRoleLabelName] = serviceRoleUser
+
+	if service.TaskTemplate.ContainerSpec.Labels == nil {
+		service.TaskTemplate.ContainerSpec.Labels = make(map[string]string)
+	}
+	service.TaskTemplate.ContainerSpec.Labels[serviceRoleLabelName] = serviceRoleUser
 
 	if serv.PublishSpecs != nil {
 		nn := len(serv.PublishSpecs)

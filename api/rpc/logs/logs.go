@@ -51,18 +51,24 @@ func (logs *Logs) Get(ctx context.Context, in *GetRequest) (*GetReply, error) {
 		queryString := elastic.NewQueryStringQuery(in.Message + "*")
 		queryString.Field("message")
 		queryString.AnalyzeWildcard(true)
+
 		masterQuery.Must(queryString)
 	}
 	if in.Node != "" {
 		masterQuery.Must(elastic.NewPrefixQuery("node_id", in.Node))
 	}
 	if in.Service != "" {
-		masterQuery.Should(elastic.NewPrefixQuery("service_id", in.Service))
-		masterQuery.Should(elastic.NewPrefixQuery("service_name", in.Service))
+		masterQuery.Must(elastic.NewBoolQuery().
+			Should(elastic.NewPrefixQuery("service_id", in.Service)).
+			Should(elastic.NewPrefixQuery("service_name", in.Service)))
 	}
 	if in.Stack != "" {
-		masterQuery.Should(elastic.NewPrefixQuery("stack_id", in.Stack))
-		masterQuery.Should(elastic.NewPrefixQuery("stack_name", in.Stack))
+		masterQuery.Must(elastic.NewBoolQuery().
+			Should(elastic.NewPrefixQuery("stack_id", in.Stack)).
+			Should(elastic.NewPrefixQuery("stack_name", in.Stack)))
+	}
+	if in.Infrastructure {
+		masterQuery.Must(elastic.NewTermQuery("infrastructure", true))
 	}
 	// TODO timestamp queries
 
@@ -84,7 +90,7 @@ func (logs *Logs) Get(ctx context.Context, in *GetRequest) (*GetReply, error) {
 	}
 
 	// Reverse entries
-	for i, j := 0, len(reply.Entries)-1; i < j; i, j = i+1, j-1 {
+	for i, j := 0, len(reply.Entries) - 1; i < j; i, j = i + 1, j - 1 {
 		reply.Entries[i], reply.Entries[j] = reply.Entries[j], reply.Entries[i]
 	}
 

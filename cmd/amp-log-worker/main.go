@@ -72,6 +72,9 @@ const (
               "stack_name": {
                 "type": "string",
                 "index": "not_analyzed"
+              },
+              "is_published": {
+                "type": "boolean"
               }
             }
           }

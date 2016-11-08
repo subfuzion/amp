@@ -55,7 +55,7 @@ func openLogsStream(ID string, lastTimeID string) (io.ReadCloser, error) {
 //Use elasticsearch REST API directly
 func getLastTimeID(ID string) string {
 	request := strings.Replace(elasticSearchTimeIDQuery, "[container_id]", ID, 1)
-	req, err := http.NewRequest("POST", "http://"+conf.elasticsearchURL, bytes.NewBuffer([]byte(request)))
+	req, err := http.NewRequest("POST", "http://" + conf.elasticsearchURL, bytes.NewBuffer([]byte(request)))
 	req.Header.Set("Content-Type", "application/json")
 
 	client := &http.Client{}
@@ -76,15 +76,15 @@ func extractTimeID(body string) string {
 	if ll < 0 {
 		return ""
 	}
-	delim1 := strings.IndexByte(body[ll+8:], '"')
+	delim1 := strings.IndexByte(body[ll + 8:], '"')
 	if delim1 < 0 {
 		return ""
 	}
-	delim2 := strings.IndexByte(body[ll+8+delim1+1:], '"')
+	delim2 := strings.IndexByte(body[ll + 8 + delim1 + 1:], '"')
 	if delim2 < 0 {
 		return ""
 	}
-	ret := body[ll+delim1+9 : ll+delim1+9+delim2]
+	ret := body[ll + delim1 + 9 : ll + delim1 + 9 + delim2]
 	if len(ret) < 25 {
 		return ""
 	}
@@ -100,6 +100,8 @@ func startReadingLogs(ID string, data *ContainerData) {
 	nodeID := data.labels["com.docker.swarm.node.id"]
 	stackID := data.labels["io.amp.stack.id"]
 	stackName := data.labels["io.amp.stack.name"]
+	role := data.labels["io.amp.role"]
+	infrastructure := role == ""
 	reader := bufio.NewReader(stream)
 	fmt.Printf("start reading logs on container: %s\n", data.name)
 	for {
@@ -124,17 +126,18 @@ func startReadingLogs(ID string, data *ContainerData) {
 		}
 
 		logEntry := logs.LogEntry{
-			ServiceName: serviceName,
-			ServiceId:   serviceID,
-			TaskName:    taskName,
-			TaskId:      taskID,
-			StackId:     stackID,
-			StackName:   stackName,
-			NodeId:      nodeID,
-			ContainerId: ID,
-			Message:     slog,
-			Timestamp:   timestamp.Format(time.RFC3339Nano),
-			TimeId:      timestamp.Format(time.RFC3339Nano),
+			Infrastructure: infrastructure,
+			ServiceName:    serviceName,
+			ServiceId:      serviceID,
+			TaskName:       taskName,
+			TaskId:         taskID,
+			StackId:        stackID,
+			StackName:      stackName,
+			NodeId:         nodeID,
+			ContainerId:    ID,
+			Message:        slog,
+			Timestamp:      timestamp.Format(time.RFC3339Nano),
+			TimeId:         timestamp.Format(time.RFC3339Nano),
 		}
 
 		encoded, err := proto.Marshal(&logEntry)
