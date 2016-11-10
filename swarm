@@ -50,6 +50,7 @@ MINIMAGES=(
 # please keep sorted
 SERVICES=(
   amplifier
+  amplifiergateway
   ampagent
   amplogworker
   ampui
@@ -257,6 +258,14 @@ amplifier() {
     --constraint "node.role == manager" \
     --mount type=bind,source=/var/run/docker.sock,target=/var/run/docker.sock \
     appcelerator/amp:${AMP_VERSION}
+}
+
+amplifiergateway() {
+  docker service create --with-registry-auth --network amp-infra,amp-public --name amplifier-gateway \
+    -e amplifier_endpoint=amplifier:50101 \
+    --label io.amp.role="infrastructure" \
+    appcelerator/amp:${AMP_VERSION} \
+    amplifier-gateway
 }
 
 # DEPENDENCIES nats
