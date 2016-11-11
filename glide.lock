@@ -1,5 +1,5 @@
 hash: 07fcf39bd02be9c83c2da288f845d06311af2074987cb4bfd1acdc38056ad0d6
-updated: 2016-11-09T17:22:49.913931829-08:00
+updated: 2016-11-10T14:36:51.42667945-08:00
 imports:
 - name: github.com/coreos/etcd
   version: 83347907774bf36cbb261c594a32fd7b0f5dd9f6
