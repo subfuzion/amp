@@ -48,7 +48,7 @@ func main() {
 		wd + ":/go/src/github.com/appcelerator/amp",
 		"-v",
 		"/var/run/docker.sock:/var/run/docker.sock",
-		"test",
+		"appcelerator/protoc",
 	}
 	protocArgs := []string{
 		"--go_out=Mgoogle/api/annotations.proto=github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis/google/api,plugins=grpc:/go/src/",
