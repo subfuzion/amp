@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<title>logs</title>
+<style>
+  html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+  }
+  body {
+    min-height: 100%;
+    margin: 0;
+    padding: 0;
+    background-color: #333;
+    font-family: monospace;
+  }
+  #terminal {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+  }
+</style>
+<div id="terminal"></div>
+<script src="/hterm_all.js"></script>
+<script>
+  let term, ws
+  (() => {
+    hterm.defaultStorage = new lib.Storage.Memory()
+    term = new hterm.Terminal()
+    term.onTerminalReady = () => {
+      const io = term.io.push()
+      fetch('http://amplifier-api.local.appcelerator.io/v1/logStream').then(r => {
+        const reader = r.body.getReader()
+        const decoder = new TextDecoder()
+        let text = ""
+        function watch() {
+          reader.read().then( r => {
+            text += decoder.decode(r.value || new Uint8Array, {
+              stream: !r.done
+            })
+            const chunks = text.split('\n')
+            let remainder = []
+            console.log(chunks.length)
+            for (const chunk of chunks) {
+               try {
+                const data = JSON.parse(chunk)
+                io.println(data.result.message)
+              } catch (e) {
+                remainder.push(chunk)
+              }
+            }
+            text = remainder.join('\n')
+            return watch()
+          })
+        }
+        watch()
+      })
+    }
+    term.decorate(document.querySelector('#terminal'))
+  })()
+</script>

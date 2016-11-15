@@ -172,6 +172,7 @@ install-host: proto-host
 	@go install $(LDFLAGS) $(REPO)/$(CMDDIR)/$(SERVER)
 	@go install $(LDFLAGS) $(REPO)/$(CMDDIR)/$(AGENT)
 	@go install $(LDFLAGS) $(REPO)/$(CMDDIR)/$(LOGWORKER)
+	@go install $(LDFLAGS) $(REPO)/$(CMDDIR)/$(GATEWAY)
 
 # used to run protoc when you're already inside a container
 proto-host: $(PROTOFILES)
