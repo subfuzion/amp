@@ -78,6 +78,9 @@ clean:
 	@rm -f $$(which $(CLI)) ./$(CLI)
 	@rm -f $$(which $(SERVER)) ./$(SERVER)
 	@rm -f coverage.out coverage-all.out
+	@rm -f $$(which $(AGENT)) ./$(AGENT)
+	@rm -f $$(which $(LOGWORKER)) ./$(LOGWORKER)
+	@rm -f $$(which $(GATEWAY)) ./$(GATEWAY)
 
 install-deps:
 	@$(GLIDE_INSTALL)

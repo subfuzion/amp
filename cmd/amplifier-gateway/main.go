@@ -2,9 +2,9 @@ package main
 
 import (
 	"flag"
+	"log"
 	"net/http"
 
-	"github.com/golang/glog"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
@@ -55,9 +55,8 @@ func run() (err error) {
 
 func main() {
 	flag.Parse()
-	defer glog.Flush()
 
 	if err := run(); err != nil {
-		glog.Fatal(err)
+		log.Fatal(err)
 	}
 }
