@@ -11,7 +11,6 @@ import (
 	"time"
 )
 
-// build vars
 var (
 	// Version is set with a linker flag (see Makefile)
 	Version string
@@ -21,11 +20,13 @@ var (
 
 	// Elasticsearch
 	es elasticsearch.Elasticsearch
+
+	// The NATS client ID. We use the hostname to make sure every ID is different and also correlate which client is running in which container, since the hostname is supposed to be the container ID when running as a docker service.
+	clientID = "amp-log-worker-" + os.Getenv("HOSTNAME")
 )
 
 const (
 	clusterID        = "test-cluster"
-	clientID         = "amp-log-worker-" + os.Getenv("HOSTNAME")
 	natsURL          = "nats://nats:4222"
 	natsTopic        = "amp-logs"
 	elasticsearchURL = "http://elasticsearch:9200"
@@ -99,7 +100,7 @@ func main() {
 	}
 	log.Printf("Connected to NATS-Streaming at %s\n", natsURL)
 
-	_, err = sc.Subscribe(natsTopic, messageHandler, stan.DeliverAllAvailable(), stan.DurableName("amp-logs-durable"))
+	_, err = sc.Subscribe(natsTopic, messageHandler, stan.DurableName("amp-logs-durable"))
 	if err != nil {
 		sc.Close()
 		log.Fatalf("Unable to subscribe to %s topic: %s", natsTopic, err)

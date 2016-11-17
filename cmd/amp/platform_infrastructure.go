@@ -11,7 +11,7 @@ const (
 )
 
 const (
-	ampVersion           = "latest"
+	ampVersion           = "test"
 	uiVersion            = "0.2.0"
 	influxDBVersion      = "1.1.0"
 	kapacitorVersion     = "1.1.0"
