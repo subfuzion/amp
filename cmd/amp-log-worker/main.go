@@ -25,7 +25,7 @@ var (
 
 const (
 	clusterID        = "test-cluster"
-	clientID         = "amp-log-worker"
+	clientID         = "amp-log-worker-" + os.Getenv("HOSTNAME")
 	natsURL          = "nats://nats:4222"
 	natsTopic        = "amp-logs"
 	elasticsearchURL = "http://elasticsearch:9200"
