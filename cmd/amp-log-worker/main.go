@@ -21,7 +21,8 @@ var (
 	// Elasticsearch
 	es elasticsearch.Elasticsearch
 
-	// The NATS client ID. We use the hostname to make sure every ID is different and also correlate which client is running in which container, since the hostname is supposed to be the container ID when running as a docker service.
+	// The NATS client ID. We use the hostname to make sure every ID is different and also correlate which client is
+	// running in which container, since the hostname is supposed to be the container ID when running as a docker service.
 	clientID = "amp-log-worker-" + os.Getenv("HOSTNAME")
 )
 
