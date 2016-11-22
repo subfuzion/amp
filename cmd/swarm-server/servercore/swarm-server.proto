@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+package servercore;
+
+service SwarmServerService {
+        rpc GetStream (stream SwarmMes) returns (stream SwarmMes) {}
+        rpc DeclareAgent (DeclareRequest) returns (ServerRet) {}
+}
+
+
+message SwarmMes {
+        string function = 1;
+        map<string, string> args = 2;
+        bytes data = 3;
+}
+
+message DeclareRequest{
+        string name = 1;
+}
+
+message ServerRet{
+       bool ack = 1; 
+}
