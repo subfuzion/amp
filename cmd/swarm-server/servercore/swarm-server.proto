@@ -3,15 +3,20 @@ syntax = "proto3";
 package servercore;
 
 service SwarmServerService {
-        rpc GetStream (stream SwarmMes) returns (stream SwarmMes) {}
+        rpc GetAgentStream (stream AgentMes) returns (stream AgentMes) {}
+        rpc GetClientStream (stream ClientMes) returns (stream ClientMes) {}
         rpc DeclareAgent (DeclareRequest) returns (ServerRet) {}
 }
 
 
-message SwarmMes {
+message AgentMes {
         string function = 1;
         map<string, string> args = 2;
-        bytes data = 3;
+}
+
+message ClientMes {
+        string function = 1;
+        map<string, string> args = 2;      
 }
 
 message DeclareRequest{

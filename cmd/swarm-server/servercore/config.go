@@ -26,7 +26,7 @@ func (c *ServerConfig) init(version string, build string) {
 func (c *ServerConfig) setDefault() {
 	c.dockerEngine = "unix:///var/run/docker.sock"
 	c.apiPort = "3000"
-	c.grpcPort = "3010"
+	c.grpcPort = "31315"
 }
 
 //Update config with env variables
@@ -42,7 +42,7 @@ func (c *ServerConfig) displayConfig(version string, build string) {
 	fmt.Println("----------------------------------------------------------------------------")
 	fmt.Println("Configuration:")
 	fmt.Printf("Docker-engine: %s\n", c.dockerEngine)
-	fmt.Printf("ServerPort: %s\n", c.grpcPort)
+	fmt.Printf("GRPC Port: %s\n", c.grpcPort)
 	fmt.Println("----------------------------------------------------------------------------")
 }
 

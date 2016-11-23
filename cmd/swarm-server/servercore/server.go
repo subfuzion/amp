@@ -2,11 +2,11 @@ package servercore
 
 import (
 	"fmt"
-	"io"
 	"net"
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 
 	//"github.com/docker/docker/api/types"
 	"github.com/docker/docker/client"
@@ -26,6 +26,7 @@ type Agent struct {
 
 //AgentInit Connect to docker engine, get initial containers list and start the agent
 func (s *SwarmServer) Init(version string, build string) error {
+	s.agentMap = make(map[string]*Agent)
 	s.trapSignal()
 	conf.init(version, build)
 
@@ -40,36 +41,27 @@ func (s *SwarmServer) Init(version string, build string) error {
 
 	// Start server
 	s.startGRPCServer()
-	logf.info("Start GRPC server\n")
+	logf.info("GRPC server started\n")
+	for {
+		time.Sleep(1 * time.Second)
+	}
 	return nil
 }
 
 func (s *SwarmServer) startGRPCServer() {
 	serv := grpc.NewServer()
 	RegisterSwarmServerServiceServer(serv, s)
-	lis, err := net.Listen("tcp", ":"+conf.grpcPort)
-	if err != nil {
-		logf.error("gnode is unable to listen on: %s\n%v", ":"+conf.grpcPort, err)
-	}
-	logf.info("gnode is listening on port %s\n", ":"+conf.grpcPort)
-	if err := serv.Serve(lis); err != nil {
-		logf.error("Problem in gnode server: %s\n", err)
-	}
-}
-
-func (s *SwarmServer) startServerReader(stream SwarmServerService_GetStreamServer) {
-	for {
-		mes, err := stream.Recv()
-		if err == io.EOF {
-			logf.error("Stream Server EOF\n")
-			return
-		}
+	go func() {
+		logf.info("Starting GRPC server\n")
+		lis, err := net.Listen("tcp", ":"+conf.grpcPort)
 		if err != nil {
-			logf.error("Stream Server error: %v\n", err)
-			return
+			logf.error("swarm-server is unable to listen on: %s\n%v", ":"+conf.grpcPort, err)
 		}
-		logf.info("received: %v\n", mes)
-	}
+		logf.info("swarm-server is listening on port %s\n", conf.grpcPort)
+		if err := serv.Serve(lis); err != nil {
+			logf.error("Problem in swarm-server: %s\n", err)
+		}
+	}()
 }
 
 // Launch a routine to catch SIGTERM Signal

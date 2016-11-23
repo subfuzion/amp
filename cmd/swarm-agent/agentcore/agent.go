@@ -20,7 +20,7 @@ type SwarmAgent struct {
 	name         string
 	dockerClient *client.Client
 	client       servercore.SwarmServerServiceClient
-	stream       servercore.SwarmServerService_GetStreamClient
+	stream       servercore.SwarmServerService_GetAgentStreamClient
 	conn         *grpc.ClientConn
 }
 
@@ -56,7 +56,7 @@ func (g *SwarmAgent) connectServer() error {
 		return err
 	}
 	g.conn = conn
-	servercore.NewSwarmServerServiceClient(conn)
+	g.client = servercore.NewSwarmServerServiceClient(conn)
 	g.client.DeclareAgent(context.Background(), &servercore.DeclareRequest{
 		Name: g.name,
 	})
@@ -64,28 +64,24 @@ func (g *SwarmAgent) connectServer() error {
 }
 
 func (g *SwarmAgent) startAgentReader(ctx context.Context) error {
-	stream, err := g.client.GetStream(ctx)
+	stream, err := g.client.GetAgentStream(ctx)
 	if err != nil {
 		return err
 	}
 	g.stream = stream
-	go func() {
-		for {
-			mes, err := g.stream.Recv()
-			if err == io.EOF {
-				logf.info("Server stream EOF\n")
-				//close(g.recvChan)
-				return
-			}
-			if err != nil {
-				logf.error("Server stream error: %v\n", err)
-				return
-			}
-			//g.recvChan <- mes
-			logf.info("Receive answer: %v\n", mes)
+	for {
+		mes, err := g.stream.Recv()
+		if err == io.EOF {
+			logf.info("Server stream EOF\n")
+			//close(g.recvChan)
+			return nil
 		}
-	}()
-	return nil
+		if err != nil {
+			return fmt.Errorf("Server stream error: %v\n", err)
+		}
+		//g.recvChan <- mes
+		logf.info("Receive answer: %v\n", mes)
+	}
 }
 
 // Launch a routine to catch SIGTERM Signal

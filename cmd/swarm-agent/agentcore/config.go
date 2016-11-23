@@ -29,7 +29,8 @@ func (c *AgentConfig) setDefault() {
 	c.dockerEngine = "unix:///var/run/docker.sock"
 	c.apiPort = "3000"
 	c.agentID = os.Getenv("HOSTNAME")
-	c.serverPort = "3010"
+	c.serverAddr = "swarm-server"
+	c.serverPort = "31315"
 }
 
 //Update config with env variables
@@ -37,7 +38,7 @@ func (c *AgentConfig) loadConfigUsingEnvVariable() {
 	c.dockerEngine = c.getStringParameter("DOCKER", c.dockerEngine)
 	c.apiPort = c.getStringParameter("API_PORT", c.apiPort)
 	c.serverPort = c.getStringParameter("SERVER_PORT", c.serverPort)
-	c.serverAddr = c.getStringParameter("SERVER", c.serverAddr)
+	c.serverAddr = c.getStringParameter("SERVER_ADDR", c.serverAddr)
 }
 
 //display amp-pilot configuration
@@ -47,7 +48,7 @@ func (c *AgentConfig) displayConfig(version string, build string) {
 	fmt.Println("Configuration:")
 	fmt.Printf("Docker-engine: %s\n", c.dockerEngine)
 	fmt.Printf("AgentId: %s\n", c.agentID)
-	fmt.Printf("ServerPort: %s\n", c.serverPort)
+	fmt.Printf("Swarm-server: %s:%s\n", c.serverAddr, c.serverPort)
 	fmt.Println("----------------------------------------------------------------------------")
 }
 
