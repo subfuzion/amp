@@ -600,6 +600,64 @@ func getAMPInfrastructureStack(m *ampManager) *ampStack {
 		},
 		"amplifier")
 
+	//add amp-event-http
+	stack.addService(m, "amp-event-http", "amp", 1,
+		&swarm.ServiceSpec{
+			Annotations: swarm.Annotations{
+				Labels: map[string]string{
+					"io.amp.role": "infrastructure",
+				},
+			},
+			TaskTemplate: swarm.TaskSpec{
+				ContainerSpec: swarm.ContainerSpec{
+					Args: []string{"amp-event-http"},
+					Env:  nil,
+					Labels: map[string]string{
+						"io.amp.role": "infrastructure",
+					},
+					Mounts: nil,
+				},
+				Placement: nil,
+			},
+			EndpointSpec: nil,
+			Networks: []swarm.NetworkAttachmentConfig{
+				{
+					Target:  infraPrivateNetwork,
+					Aliases: []string{"amp-event-http"},
+				},
+			},
+		},
+		"nats")
+
+	//add amp-event-worker
+	stack.addService(m, "amp-event-worker", "amp", 1,
+		&swarm.ServiceSpec{
+			Annotations: swarm.Annotations{
+				Labels: map[string]string{
+					"io.amp.role": "infrastructure",
+				},
+			},
+			TaskTemplate: swarm.TaskSpec{
+				ContainerSpec: swarm.ContainerSpec{
+					Args: []string{"amp-event-worker"},
+					Env:  nil,
+					Labels: map[string]string{
+						"io.amp.role": "infrastructure",
+					},
+					Mounts: nil,
+				},
+				Placement: nil,
+			},
+			EndpointSpec: nil,
+			Networks: []swarm.NetworkAttachmentConfig{
+				{
+					Target:  infraPrivateNetwork,
+					Aliases: []string{"amp-event-worker"},
+				},
+			},
+		},
+		"nats")
+
 	//return stack
 	return &stack
 }

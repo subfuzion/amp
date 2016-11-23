@@ -48,6 +48,8 @@ SERVER := amplifier
 AGENT := amp-agent
 LOGWORKER := amp-log-worker
 GATEWAY := amplifier-gateway
+EVENT_HTTP := amp-event-http
+EVENT_WORKER := amp-event-worker
 
 TAG := latest
 IMAGE := $(OWNER)/amp:$(TAG)
@@ -99,6 +101,8 @@ clean:
 	@rm -f $$(which $(AGENT)) ./$(AGENT)
 	@rm -f $$(which $(LOGWORKER)) ./$(LOGWORKER)
 	@rm -f $$(which $(GATEWAY)) ./$(GATEWAY)
+	@rm -f $$(which $(GATEWAY)) ./$(EVENT_HTTP)
+	@rm -f $$(which $(GATEWAY)) ./$(EVENT_WORKER)
 
 install:
 	@go install $(LDFLAGS) $(REPO)/$(CMDDIR)/$(CLI)
@@ -106,6 +110,8 @@ install:
 	@go install $(LDFLAGS) $(REPO)/$(CMDDIR)/$(AGENT)
 	@go install $(LDFLAGS) $(REPO)/$(CMDDIR)/$(LOGWORKER)
 	@go install $(LDFLAGS) $(REPO)/$(CMDDIR)/$(GATEWAY)
+	@go install $(LDFLAGS) $(REPO)/$(CMDDIR)/$(EVENT_HTTP)
+	@go install $(LDFLAGS) $(REPO)/$(CMDDIR)/$(EVENT_WORKER)
 
 build:
 	@hack/build $(CLI)
@@ -113,6 +119,8 @@ build:
 	@hack/build $(AGENT)
 	@hack/build $(LOGWORKER)
 	@hack/build $(GATEWAY)
+	@hack/build $(EVENT_HTTP)
+	@hack/build $(EVENT_WORKER)
 
 build-server-image:
 	@docker build -t appcelerator/$(SERVER):$(TAG) .
