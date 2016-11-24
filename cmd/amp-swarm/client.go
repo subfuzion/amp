@@ -36,14 +36,13 @@ var (
 func (g *swarmClient) init() error {
 	g.ctx = context.Background()
 	g.recvChan = make(chan *servercore.ClientMes)
-	g.printf("connectserver: %s:%s\n", conf.serverAddr, conf.serverPort)
 	if err := g.connectServer(); err != nil {
 		return err
 	}
 	if err := g.startServerReader(); err != nil {
 		return err
 	}
-	g.printf("Client connected to swarm-server")
+	g.printf("Client connected to swarm-server\n")
 	return nil
 }
 

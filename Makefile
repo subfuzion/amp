@@ -221,3 +221,19 @@ cover:
 		go test -coverprofile=coverage.out -covermode=count $(pkg);\
 		tail -n +2 coverage.out >> coverage-all.out;)
 	go tool cover -html=coverage-all.out
+
+start-swarm-services:
+	@docker service create --network amp-infra --name swarm-server \
+	--constraint "node.role == manager" \
+	--publish 31315:31315 \
+	--mount type=bind,source=/var/run/docker.sock,target=/var/run/docker.sock \
+	appcelerator/amp:test1 swarm-server
+
+	@docker service create --network amp-infra --name swarm-agent \
+	--mode global \
+	--mount type=bind,source=/var/run/docker.sock,target=/var/run/docker.sock \
+	appcelerator/amp:test1 swarm-agent
+
+stop-swarm-services:
+	@docker service rm swarm-agent || true
+	@docker service rm swarm-server || true
