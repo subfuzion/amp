@@ -1,15 +1,10 @@
 package main
 
 import (
-	"github.com/appcelerator/amp/api/rpc/logs"
-	"github.com/appcelerator/amp/data/elasticsearch"
-	"github.com/aws/aws-sdk-go/awstesting/integration/smoke/es"
-	"github.com/golang/protobuf/proto"
 	"github.com/nats-io/go-nats-streaming"
 	"log"
 	"os"
 	"os/signal"
-	"time"
 )
 
 // build vars
