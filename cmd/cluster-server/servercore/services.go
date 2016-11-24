@@ -7,21 +7,7 @@ import (
 	"io"
 )
 
-func (s *SwarmServer) GetAgentStream(stream servergrpc.SwarmServerService_GetAgentStreamServer) error {
-	for {
-		mes, err := stream.Recv()
-		if err == io.EOF {
-			logf.error("Stream Server-agent EOF\n")
-			return nil
-		}
-		if err != nil {
-			return fmt.Errorf("Stream Server-agent error: %v\n", err)
-		}
-		logf.info("received agent message: %v\n", mes)
-	}
-}
-
-func (s *SwarmServer) GetClientStream(stream servergrpc.SwarmServerService_GetClientStreamServer) error {
+func (s *ClusterServer) GetClientStream(stream servergrpc.ClusterServerService_GetClientStreamServer) error {
 	for {
 		mes, err := stream.Recv()
 		if err == io.EOF {
@@ -35,7 +21,7 @@ func (s *SwarmServer) GetClientStream(stream servergrpc.SwarmServerService_GetCl
 	}
 }
 
-func (s *SwarmServer) DeclareAgent(ctx context.Context, req *servergrpc.DeclareRequest) (*servergrpc.ServerRet, error) {
+func (s *ClusterServer) DeclareAgent(ctx context.Context, req *servergrpc.DeclareRequest) (*servergrpc.ServerRet, error) {
 	s.agentMap[req.Name] = &Agent{
 		name: req.Name,
 	}

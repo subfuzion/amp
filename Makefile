@@ -222,18 +222,12 @@ cover:
 		tail -n +2 coverage.out >> coverage-all.out;)
 	go tool cover -html=coverage-all.out
 
-start-cluster-services:
+start-cluster-server:
 	@docker service create --network amp-infra --name cluster-server \
 	--constraint "node.role == manager" \
 	--publish 31315:31315 \
 	--mount type=bind,source=/var/run/docker.sock,target=/var/run/docker.sock \
 	appcelerator/amp:test1 cluster-server
 
-	@docker service create --network amp-infra --name cluster-agent \
-	--mode global \
-	--mount type=bind,source=/var/run/docker.sock,target=/var/run/docker.sock \
-	appcelerator/amp:test1 cluster-agent
-
-stop-cluster-services:
-	@docker service rm cluster-agent || true
+stop-cluster-server:
 	@docker service rm cluster-server || true

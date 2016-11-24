@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package agentgrpc;
 
-service SwarmServerService {
+service ClusterAgentService {
         rpc GetNodeInfo (GetNodeInfoRequest) returns (NodeInfo) {}
 }
 

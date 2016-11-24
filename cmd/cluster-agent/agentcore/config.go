@@ -11,6 +11,7 @@ type AgentConfig struct {
 	dockerEngine string
 	apiPort      string
 	agentID      string
+	grpcPort     string
 	serverPort   string
 	serverAddr   string
 }
@@ -29,26 +30,29 @@ func (c *AgentConfig) setDefault() {
 	c.dockerEngine = "unix:///var/run/docker.sock"
 	c.apiPort = "3000"
 	c.agentID = os.Getenv("HOSTNAME")
-	c.serverAddr = "swarm-server"
+	c.serverAddr = "127.0.0.1"
 	c.serverPort = "31315"
+	c.grpcPort = "31316"
 }
 
 //Update config with env variables
 func (c *AgentConfig) loadConfigUsingEnvVariable() {
 	c.dockerEngine = c.getStringParameter("DOCKER", c.dockerEngine)
 	c.apiPort = c.getStringParameter("API_PORT", c.apiPort)
+	c.grpcPort = c.getStringParameter("AGENT_PORT", c.grpcPort)
 	c.serverPort = c.getStringParameter("SERVER_PORT", c.serverPort)
 	c.serverAddr = c.getStringParameter("SERVER_ADDR", c.serverAddr)
 }
 
 //display amp-pilot configuration
 func (c *AgentConfig) displayConfig(version string, build string) {
-	fmt.Printf("amp-swarm version: %v build: %s\n", version, build)
+	fmt.Printf("cluster-agent version: %v build: %s\n", version, build)
 	fmt.Println("----------------------------------------------------------------------------")
 	fmt.Println("Configuration:")
 	fmt.Printf("Docker-engine: %s\n", c.dockerEngine)
 	fmt.Printf("AgentId: %s\n", c.agentID)
-	fmt.Printf("Swarm-server: %s:%s\n", c.serverAddr, c.serverPort)
+	fmt.Printf("Agent port: %s\n", c.grpcPort)
+	fmt.Printf("cluster-server: %s:%s\n", c.serverAddr, c.serverPort)
 	fmt.Println("----------------------------------------------------------------------------")
 }
 

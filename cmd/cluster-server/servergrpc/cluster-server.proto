@@ -2,8 +2,7 @@ syntax = "proto3";
 
 package servergrpc;
 
-service SwarmServerService {
-        rpc GetAgentStream (stream AgentMes) returns (stream AgentMes) {}
+service ClusterServerService {
         rpc GetClientStream (stream ClientMes) returns (stream ClientMes) {}
         rpc DeclareAgent (DeclareRequest) returns (ServerRet) {}
 }

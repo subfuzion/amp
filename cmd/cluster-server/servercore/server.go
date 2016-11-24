@@ -9,24 +9,29 @@ import (
 	"time"
 
 	//"github.com/docker/docker/api/types"
+	"github.com/appcelerator/amp/cmd/cluster-agent/agentgrpc"
 	"github.com/appcelerator/amp/cmd/cluster-server/servergrpc"
 	"github.com/docker/docker/client"
 	"google.golang.org/grpc"
 )
 
 //Server data
-type SwarmServer struct {
+type ClusterServer struct {
 	dockerClient *client.Client
 	agentMap     map[string]*Agent
 }
 
 //Agent data
 type Agent struct {
-	name string
+	name    string
+	address string
+	token   string
+	client  agentgrpc.ClusterAgentServiceClient
+	conn    *grpc.ClientConn
 }
 
 //AgentInit Connect to docker engine, get initial containers list and start the agent
-func (s *SwarmServer) Init(version string, build string) error {
+func (s *ClusterServer) Init(version string, build string) error {
 	s.agentMap = make(map[string]*Agent)
 	s.trapSignal()
 	conf.init(version, build)
@@ -49,30 +54,44 @@ func (s *SwarmServer) Init(version string, build string) error {
 	return nil
 }
 
-func (s *SwarmServer) startGRPCServer() {
+func (s *ClusterServer) startGRPCServer() {
 	serv := grpc.NewServer()
-	servergrpc.RegisterSwarmServerServiceServer(serv, s)
+	servergrpc.RegisterClusterServerServiceServer(serv, s)
 	go func() {
 		logf.info("Starting GRPC server\n")
 		lis, err := net.Listen("tcp", ":"+conf.grpcPort)
 		if err != nil {
-			logf.error("swarm-server is unable to listen on: %s\n%v", ":"+conf.grpcPort, err)
+			logf.error("cluster-server is unable to listen on: %s\n%v", ":"+conf.grpcPort, err)
+			return
 		}
-		logf.info("swarm-server is listening on port %s\n", conf.grpcPort)
+		logf.info("cluster-server is listening on port %s\n", conf.grpcPort)
 		if err := serv.Serve(lis); err != nil {
-			logf.error("Problem in swarm-server: %s\n", err)
+			logf.error("Problem in cluster-server: %s\n", err)
 		}
 	}()
 }
 
+func (s *ClusterServer) connectBackAgent(agent *Agent) error {
+	conn, err := grpc.Dial(agent.address,
+		grpc.WithInsecure(),
+		grpc.WithBlock(),
+		grpc.WithTimeout(time.Second*20))
+	if err != nil {
+		return err
+	}
+	agent.conn = conn
+	agent.client = agentgrpc.NewClusterAgentServiceClient(conn)
+	return nil
+}
+
 // Launch a routine to catch SIGTERM Signal
-func (s *SwarmServer) trapSignal() {
+func (s *ClusterServer) trapSignal() {
 	ch := make(chan os.Signal, 1)
 	signal.Notify(ch, os.Interrupt)
 	signal.Notify(ch, syscall.SIGTERM)
 	go func() {
 		<-ch
-		fmt.Println("\nswarm-server received SIGTERM signal")
+		fmt.Println("cluster-server received SIGTERM signal")
 		os.Exit(1)
 	}()
 }

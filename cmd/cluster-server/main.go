@@ -24,7 +24,7 @@ func main() {
 		}
 		os.Exit(0)
 	}
-	server := &servercore.SwarmServer{}
+	server := &servercore.ClusterServer{}
 	err := server.Init(Version, Build)
 	if err != nil {
 		log.Fatal(err)

@@ -38,7 +38,7 @@ func (c *ServerConfig) loadConfigUsingEnvVariable() {
 
 //display amp-pilot configuration
 func (c *ServerConfig) displayConfig(version string, build string) {
-	fmt.Printf("amp-swarm version: %v build: %s\n", version, build)
+	fmt.Printf("cluster-server version: %v build: %s\n", version, build)
 	fmt.Println("----------------------------------------------------------------------------")
 	fmt.Println("Configuration:")
 	fmt.Printf("Docker-engine: %s\n", c.dockerEngine)

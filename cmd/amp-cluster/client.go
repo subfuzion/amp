@@ -12,8 +12,8 @@ import (
 
 type swarmClient struct {
 	name     string
-	client   servergrpc.SwarmServerServiceClient
-	stream   servergrpc.SwarmServerService_GetClientStreamClient
+	client   servergrpc.ClusterServerServiceClient
+	stream   servergrpc.ClusterServerService_GetClientStreamClient
 	conn     *grpc.ClientConn
 	ctx      context.Context
 	verbose  bool
@@ -42,7 +42,7 @@ func (g *swarmClient) init() error {
 	if err := g.startServerReader(); err != nil {
 		return err
 	}
-	g.printf("Client connected to swarm-server\n")
+	g.printf("Client connected to cluster-server\n")
 	return nil
 }
 
@@ -55,7 +55,7 @@ func (g *swarmClient) connectServer() error {
 		return err
 	}
 	g.conn = conn
-	g.client = servergrpc.NewSwarmServerServiceClient(conn)
+	g.client = servergrpc.NewClusterServerServiceClient(conn)
 	return nil
 }
 

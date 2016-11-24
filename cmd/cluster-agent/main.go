@@ -24,7 +24,7 @@ func main() {
 		}
 		os.Exit(0)
 	}
-	agent := &agentcore.SwarmAgent{}
+	agent := &agentcore.ClusterAgent{}
 	err := agent.Init(Version, Build)
 	if err != nil {
 		log.Fatal(err)
