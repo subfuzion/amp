@@ -79,7 +79,7 @@ const (
 )
 
 func main() {
-	log.Printf("amp-log-worker (version: %s, build: %s)\n", Version, Build)
+	log.Printf("amp-event-http (version: %s, build: %s)\n", Version, Build)
 
 	err := es.Connect(elasticsearchURL, 60*time.Second)
 	if err != nil {

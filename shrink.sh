@@ -54,6 +54,16 @@ if [ $? -ne 0 ]; then
   echo "failed"
   exit 1
 fi
+$DOCKER cp amp-builder:/go/bin/amp-event-http ./amp-event-http >&2
+if [ $? -ne 0 ]; then
+  echo "failed"
+  exit 1
+fi
+$DOCKER cp amp-builder:/go/bin/amp-event-worker ./amp-event-worker >&2
+if [ $? -ne 0 ]; then
+  echo "failed"
+  exit 1
+fi
 echo "OK"
 
 echo -n "building shrunk image... "
@@ -65,7 +75,7 @@ fi
 echo "OK"
 
 echo -n "cleanup... "
-rm -f amp amplifier amp-agent amp-log-worker amplifier-gateway
+rm -f amp amplifier amp-agent amp-log-worker amplifier-gateway amp-event-http amp-event-worker
 $DOCKER kill amp-builder >/dev/null 2>&1
 $DOCKER rm amp-builder >/dev/null 2>&1
 $DOCKER rmi $REPOSITORY_NAME:builder
