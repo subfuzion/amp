@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package servercore;
+package servergrpc;
 
 service SwarmServerService {
         rpc GetAgentStream (stream AgentMes) returns (stream AgentMes) {}

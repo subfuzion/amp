@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package agentgrpc;
+
+service SwarmServerService {
+        rpc GetNodeInfo (GetNodeInfoRequest) returns (NodeInfo) {}
+}
+
+
+message GetNodeInfoRequest{
+}
+
+message NodeInfo{
+        string name =1;
+}

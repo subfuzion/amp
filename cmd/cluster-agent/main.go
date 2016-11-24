@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/appcelerator/amp/cmd/swarm-agent/agentcore"
+	"github.com/appcelerator/amp/cmd/cluster-agent/agentcore"
 	"log"
 	"net/http"
 	"os"

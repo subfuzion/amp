@@ -54,17 +54,12 @@ if [ $? -ne 0 ]; then
   echo "failed"
   exit 1
 fi
-$DOCKER cp amp-builder:/go/bin/swarm-server ./swarm-server >&2
+$DOCKER cp amp-builder:/go/bin/cluster-server ./cluster-server >&2
 if [ $? -ne 0 ]; then
   echo "failed"
   exit 1
 fi
-$DOCKER cp amp-builder:/go/bin/swarm-agent ./swarm-agent >&2
-if [ $? -ne 0 ]; then
-  echo "failed"
-  exit 1
-fi
-$DOCKER cp amp-builder:/go/bin/amp-swarm ./amp-swarm >&2
+$DOCKER cp amp-builder:/go/bin/cluster-agent ./cluster-agent >&2
 if [ $? -ne 0 ]; then
   echo "failed"
   exit 1

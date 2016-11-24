@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/appcelerator/amp/cmd/swarm-server/servercore"
+	"github.com/appcelerator/amp/cmd/cluster-server/servergrpc"
 	"github.com/spf13/cobra"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
@@ -12,15 +12,15 @@ import (
 
 type swarmClient struct {
 	name     string
-	client   servercore.SwarmServerServiceClient
-	stream   servercore.SwarmServerService_GetClientStreamClient
+	client   servergrpc.SwarmServerServiceClient
+	stream   servergrpc.SwarmServerService_GetClientStreamClient
 	conn     *grpc.ClientConn
 	ctx      context.Context
 	verbose  bool
 	id       int
 	nodeName string
 	nodeHost string
-	recvChan chan *servercore.ClientMes
+	recvChan chan *servergrpc.ClientMes
 }
 
 var (
@@ -35,7 +35,7 @@ var (
 
 func (g *swarmClient) init() error {
 	g.ctx = context.Background()
-	g.recvChan = make(chan *servercore.ClientMes)
+	g.recvChan = make(chan *servergrpc.ClientMes)
 	if err := g.connectServer(); err != nil {
 		return err
 	}
@@ -55,22 +55,22 @@ func (g *swarmClient) connectServer() error {
 		return err
 	}
 	g.conn = conn
-	g.client = servercore.NewSwarmServerServiceClient(conn)
+	g.client = servergrpc.NewSwarmServerServiceClient(conn)
 	return nil
 }
 
 func (g *swarmClient) createSendMessageNoAnswer(target string, functionName string, args ...string) error {
-	mes := &servercore.ClientMes{} //TODO
+	mes := &servergrpc.ClientMes{} //TODO
 	_, err := g.sendMessage(mes, true)
 	return err
 }
 
-func (g *swarmClient) createSendMessage(target string, waitForAnswer bool, functionName string, args ...string) (*servercore.ClientMes, error) {
-	mes := &servercore.ClientMes{} //TODO
+func (g *swarmClient) createSendMessage(target string, waitForAnswer bool, functionName string, args ...string) (*servergrpc.ClientMes, error) {
+	mes := &servergrpc.ClientMes{} //TODO
 	return g.sendMessage(mes, waitForAnswer)
 }
 
-func (g *swarmClient) sendMessage(mes *servercore.ClientMes, wait bool) (*servercore.ClientMes, error) {
+func (g *swarmClient) sendMessage(mes *servergrpc.ClientMes, wait bool) (*servergrpc.ClientMes, error) {
 	err := g.stream.Send(mes)
 	if err != nil {
 		return nil, err
@@ -83,7 +83,7 @@ func (g *swarmClient) sendMessage(mes *servercore.ClientMes, wait bool) (*server
 	return nil, nil
 }
 
-func (g *swarmClient) getNextAnswer() *servercore.ClientMes {
+func (g *swarmClient) getNextAnswer() *servergrpc.ClientMes {
 	mes := <-g.recvChan
 	return mes
 }

@@ -2,11 +2,12 @@ package servercore
 
 import (
 	"fmt"
+	"github.com/appcelerator/amp/cmd/cluster-server/servergrpc"
 	"golang.org/x/net/context"
 	"io"
 )
 
-func (s *SwarmServer) GetAgentStream(stream SwarmServerService_GetAgentStreamServer) error {
+func (s *SwarmServer) GetAgentStream(stream servergrpc.SwarmServerService_GetAgentStreamServer) error {
 	for {
 		mes, err := stream.Recv()
 		if err == io.EOF {
@@ -20,7 +21,7 @@ func (s *SwarmServer) GetAgentStream(stream SwarmServerService_GetAgentStreamSer
 	}
 }
 
-func (s *SwarmServer) GetClientStream(stream SwarmServerService_GetClientStreamServer) error {
+func (s *SwarmServer) GetClientStream(stream servergrpc.SwarmServerService_GetClientStreamServer) error {
 	for {
 		mes, err := stream.Recv()
 		if err == io.EOF {
@@ -34,10 +35,10 @@ func (s *SwarmServer) GetClientStream(stream SwarmServerService_GetClientStreamS
 	}
 }
 
-func (s *SwarmServer) DeclareAgent(ctx context.Context, req *DeclareRequest) (*ServerRet, error) {
+func (s *SwarmServer) DeclareAgent(ctx context.Context, req *servergrpc.DeclareRequest) (*servergrpc.ServerRet, error) {
 	s.agentMap[req.Name] = &Agent{
 		name: req.Name,
 	}
 	logf.info("Received agent declaration %s\n", req.Name)
-	return &ServerRet{Ack: true}, nil
+	return &servergrpc.ServerRet{Ack: true}, nil
 }

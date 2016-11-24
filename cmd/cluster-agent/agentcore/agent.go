@@ -8,7 +8,7 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/appcelerator/amp/cmd/swarm-server/servercore"
+	"github.com/appcelerator/amp/cmd/cluster-server/servergrpc"
 	//"github.com/docker/docker/api/types"
 	"github.com/docker/docker/client"
 	"golang.org/x/net/context"
@@ -19,8 +19,8 @@ import (
 type SwarmAgent struct {
 	name         string
 	dockerClient *client.Client
-	client       servercore.SwarmServerServiceClient
-	stream       servercore.SwarmServerService_GetAgentStreamClient
+	client       servergrpc.SwarmServerServiceClient
+	stream       servergrpc.SwarmServerService_GetAgentStreamClient
 	conn         *grpc.ClientConn
 }
 
@@ -56,8 +56,8 @@ func (g *SwarmAgent) connectServer() error {
 		return err
 	}
 	g.conn = conn
-	g.client = servercore.NewSwarmServerServiceClient(conn)
-	g.client.DeclareAgent(context.Background(), &servercore.DeclareRequest{
+	g.client = servergrpc.NewSwarmServerServiceClient(conn)
+	g.client.DeclareAgent(context.Background(), &servergrpc.DeclareRequest{
 		Name: g.name,
 	})
 	return nil

@@ -9,6 +9,7 @@ import (
 	"time"
 
 	//"github.com/docker/docker/api/types"
+	"github.com/appcelerator/amp/cmd/cluster-server/servergrpc"
 	"github.com/docker/docker/client"
 	"google.golang.org/grpc"
 )
@@ -50,7 +51,7 @@ func (s *SwarmServer) Init(version string, build string) error {
 
 func (s *SwarmServer) startGRPCServer() {
 	serv := grpc.NewServer()
-	RegisterSwarmServerServiceServer(serv, s)
+	servergrpc.RegisterSwarmServerServiceServer(serv, s)
 	go func() {
 		logf.info("Starting GRPC server\n")
 		lis, err := net.Listen("tcp", ":"+conf.grpcPort)

@@ -1,7 +1,7 @@
 {
   "swagger": "2.0",
   "info": {
-    "title": "github.com/appcelerator/amp/cmd/swarm-server/servercore/swarm-server.proto",
+    "title": "github.com/appcelerator/amp/cmd/swarm-agent/agentgrpc/swarm-agent.proto",
     "version": "version not set"
   },
   "schemes": [

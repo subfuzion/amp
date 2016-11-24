@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/appcelerator/amp/cmd/swarm-server/servercore"
+	"github.com/appcelerator/amp/cmd/cluster-server/servercore"
 	"log"
 	"net/http"
 	"os"

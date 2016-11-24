@@ -48,9 +48,9 @@ SERVER := amplifier
 AGENT := amp-agent
 LOGWORKER := amp-log-worker
 GATEWAY := amplifier-gateway
-SWARMSERVER := swarm-server
-SWARMAGENT := swarm-agent
-AMPSWARM := amp-swarm
+CLUSTERSERVER := cluster-server
+CLUSTERAGENT := cluster-agent
+AMPCLUSTER := amp-cluster
 
 TAG := latest
 IMAGE := $(OWNER)/amp:$(TAG)
@@ -102,9 +102,9 @@ clean:
 	@rm -f $$(which $(AGENT)) ./$(AGENT)
 	@rm -f $$(which $(LOGWORKER)) ./$(LOGWORKER)
 	@rm -f $$(which $(GATEWAY)) ./$(GATEWAY)
-	@rm -f $$(which $(SWARMSERVER)) ./$(SWARMSERVER)
-	@rm -f $$(which $(SWARMAGENT)) ./$(SWARMAGENT)
-	@rm -f $$(which $(AMPSWARM)) ./$(AMPSWARM)
+	@rm -f $$(which $(CLUSTERSERVER)) ./$(CLUSTERSERVER)
+	@rm -f $$(which $(CLUSTERAGENT)) ./$(CLUSTERAGENT)
+	@rm -f $$(which $(AMPCLUSTER)) ./$(AMPCLUSTER)
 
 install:
 	@go install $(LDFLAGS) $(REPO)/$(CMDDIR)/$(CLI)
@@ -112,9 +112,9 @@ install:
 	@go install $(LDFLAGS) $(REPO)/$(CMDDIR)/$(AGENT)
 	@go install $(LDFLAGS) $(REPO)/$(CMDDIR)/$(LOGWORKER)
 	@go install $(LDFLAGS) $(REPO)/$(CMDDIR)/$(GATEWAY)
-	@go install $(LDFLAGS) $(REPO)/$(CMDDIR)/$(SWARMSERVER)
-	@go install $(LDFLAGS) $(REPO)/$(CMDDIR)/$(SWARMAGENT)
-	@go install $(LDFLAGS) $(REPO)/$(CMDDIR)/$(AMPSWARM)
+	@go install $(LDFLAGS) $(REPO)/$(CMDDIR)/$(CLUSTERSERVER)
+	@go install $(LDFLAGS) $(REPO)/$(CMDDIR)/$(CLUSTERAGENT)
+	@go install $(LDFLAGS) $(REPO)/$(CMDDIR)/$(AMPCLUSTER)
 
 build:
 	@hack/build $(CLI)
@@ -122,9 +122,9 @@ build:
 	@hack/build $(AGENT)
 	@hack/build $(LOGWORKER)
 	@hack/build $(GATEWAY)
-	@hack/build $(SWARMAGENT)
-	@hack/build $(SWARMSERVER)
-	@hack/build $(AMPSWARM)
+	@hack/build $(CLUSTERAGENT)
+	@hack/build $(CLUSTERSERVER)
+	@hack/build $(AMPCLUSTER)
 
 build-server-image:
 	@docker build -t appcelerator/$(SERVER):$(TAG) .
@@ -222,18 +222,18 @@ cover:
 		tail -n +2 coverage.out >> coverage-all.out;)
 	go tool cover -html=coverage-all.out
 
-start-swarm-services:
-	@docker service create --network amp-infra --name swarm-server \
+start-cluster-services:
+	@docker service create --network amp-infra --name cluster-server \
 	--constraint "node.role == manager" \
 	--publish 31315:31315 \
 	--mount type=bind,source=/var/run/docker.sock,target=/var/run/docker.sock \
-	appcelerator/amp:test1 swarm-server
+	appcelerator/amp:test1 cluster-server
 
-	@docker service create --network amp-infra --name swarm-agent \
+	@docker service create --network amp-infra --name cluster-agent \
 	--mode global \
 	--mount type=bind,source=/var/run/docker.sock,target=/var/run/docker.sock \
-	appcelerator/amp:test1 swarm-agent
+	appcelerator/amp:test1 cluster-agent
 
-stop-swarm-services:
-	@docker service rm swarm-agent || true
-	@docker service rm swarm-server || true
+stop-cluster-services:
+	@docker service rm cluster-agent || true
+	@docker service rm cluster-server || true
